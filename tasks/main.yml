@@ -46,4 +46,3 @@
     path: "{{ ntp_config }}"
     regexp: '^server$'
     replace: '# \1'
-    state: present
