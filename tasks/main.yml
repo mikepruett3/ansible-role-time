@@ -56,3 +56,23 @@
         state: present
       with_items: "{{ ntp_servers }}"
 
+- name: "Set Permissions on NTP HomeDir"
+  ansible.builtin.file:
+    path: "{{ ntp_homedir }}"
+    mode: 0750
+    state: directory
+    recurse: no
+
+- name: "Stop NTP Service"
+  ansible.builtin.service:
+    name: "{{ ntp_daemon }}"
+    state: stopped
+
+- name: "Update current time from configured servers"
+  block:
+    - name: "Update current time from configured servers (chrony)"
+      command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
+      with_items: "{{ ntp_servers }}"
+      register: ntpdate
+      failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
+      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version >= '7'
