@@ -51,7 +51,7 @@
     - name: "Insert desired server entires"
       ansible.builtin.lineinfile:
         path: "{{ ntp_config }}"
-        insertafter: '^#server'
+        insertafter: "EOF"
         line: "server {{ item }}"
         state: present
       with_items: "{{ ntp_servers }}"
