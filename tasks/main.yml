@@ -42,8 +42,8 @@
   when: item|string not in ansible_facts.packages
 
 - name: "Update Chrony configuration file"
-  ansible.builtin.lineinfile:
-    dest: "{{ ntp_config }}"
-    regexp: "^server"
-    line: "#server"
+  ansible.builtin.replace:
+    path: "{{ ntp_config }}"
+    regexp: '^server$'
+    line: '# \1'
     state: present
