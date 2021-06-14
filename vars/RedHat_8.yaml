@@ -1,5 +1,6 @@
 ---
 # vars file for ansible-role-time/
 ntp_daemon: "chronyd"
+ntp_config: "/etc/chrony.conf"
 packages:
   - "chrony"

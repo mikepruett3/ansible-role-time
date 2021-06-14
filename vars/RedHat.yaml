@@ -1,5 +1,6 @@
 ---
 # vars file for ansible-role-time/
 ntp_daemon: "ntpd"
+ntp_config: "/etc/ntpd.conf"
 packages:
   - "ntp"
