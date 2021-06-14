@@ -44,6 +44,6 @@
 - name: "Update Chrony configuration file"
   ansible.builtin.lineinfile:
     dest: "{{ ntp_config }}"
-    regexp: "^Server"
-    line: "#Server"
+    regexp: "^server"
+    line: "#server"
     state: present
