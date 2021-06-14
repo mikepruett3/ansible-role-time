@@ -55,7 +55,7 @@
     - name: "Disable existing pool entries"
       ansible.builtin.replace:
         path: "{{ ntp_config }}"
-        regexp: '^(.*pool.*)$'
+        regexp: '^(pool.*)$'
         replace: '#\1'
     - name: "Insert desired server entires"
       ansible.builtin.lineinfile:
