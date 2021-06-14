@@ -45,5 +45,5 @@
   ansible.builtin.replace:
     path: "{{ ntp_config }}"
     regexp: '^server$'
-    line: '# \1'
+    replace: '# \1'
     state: present
