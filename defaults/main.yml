@@ -1,2 +1,5 @@
 ---
 # defaults file for ansible-role-time/
+ntp_servers:
+  - 3.pool.ntp.org
+  - 2.pool.ntp.org
