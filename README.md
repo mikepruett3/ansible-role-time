@@ -14,10 +14,15 @@ Role Variables
 Available variables are listed below, along with default values (see ```defaults/main.yml```):
 
 ``` yaml
-log_server: "logserver.example.org"
+ntp_servers:
+  - 3.pool.ntp.org prefer trust
+  - 2.pool.ntp.org
+timezone: "America/Chicago"
 ```
 
-```log_server``` **(Required)** The Fully-Qualifed hostname or IP address of the remote logging server.
+```ntp_servers``` **(Required)** List of NTP servers to use in the configuration file.
+
+```timezone``` **(Required)** Timezone to use when configuring the server.
 
 Role variables can be stored with the hosts.yaml file, or in the main variables file.
 
