@@ -50,7 +50,7 @@
     - name: "Disable existing server entries"
       ansible.builtin.replace:
         path: "{{ ntp_config }}"
-        regexp: '^(.*server.*)$'
+        regexp: '^(server.*)$'
         replace: '#\1'
     - name: "Disable existing pool entries"
       ansible.builtin.replace:
