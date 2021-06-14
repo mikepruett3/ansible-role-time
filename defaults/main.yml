@@ -3,3 +3,4 @@
 ntp_servers:
   - 3.pool.ntp.org prefer trust
   - 2.pool.ntp.org
+timezone: "America/Chicago"

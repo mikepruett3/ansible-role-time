@@ -18,6 +18,10 @@
     manager: auto
   when: ansible_facts.packages is not defined
 
+- name: "Set hosts TimeZone"
+  timezone:
+    name: "{{ timezone }}"
+
 - name: "Remove NTP Daemon, if installed (RHEL7)"
   block:
     - name: "Stop NTP Service, if not already stopped"
