@@ -1,0 +1,5 @@
+---
+# vars file for ansible-role-time/
+ntp_daemon: "chronyd"
+packages:
+  - "chrony"

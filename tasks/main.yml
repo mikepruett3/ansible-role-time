@@ -1,2 +1,40 @@
 ---
 # tasks file for ansible-role-time/
+
+- name: Include OS-specific variables.
+  include_vars: "{{ lookup('first_found', params) }}"
+  vars:
+    params:
+      files:
+        - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yaml"
+        - "{{ ansible_distribution }}.yaml"
+        - "{{ ansible_os_family }}.yaml"
+        - default.yaml
+      paths:
+        - "vars"
+
+- name: "Gather the package facts"
+  ansible.builtin.package_facts:
+    manager: auto
+  when: ansible_facts.packages is not defined
+
+- name: "Remove NTP Daemon, if installed (RHEL7)"
+  block:
+    - name: "Stop NTP Service, if not already stopped"
+      service:
+        name: "ntpd"
+        state: stopped
+        enabled: no
+    - name: "Uninstall the NTP Daemon, if installed"
+      ansible.builtin.package:
+        name: 'ntp'
+        state: absent
+  when: "'ntp' in ansible_facts.packages"
+
+- name: "Install required packages, if not already installed"
+  ansible.builtin.package:
+    name: "{{ item }}"
+    state: present
+  with_items: "{{ packages }}"
+  when: item|string not in ansible_facts.packages
+
