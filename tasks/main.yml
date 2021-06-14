@@ -44,5 +44,5 @@
 - name: "Update Chrony configuration file"
   ansible.builtin.replace:
     path: "{{ ntp_config }}"
-    regexp: '^(server.)$'
-    replace: '# \1'
+    regexp: '^(.*server.*)$'
+    replace: '#\1'
