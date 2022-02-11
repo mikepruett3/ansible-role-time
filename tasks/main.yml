@@ -91,6 +91,12 @@
       register: ntpdate
       failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
       when: ansible_os_family == 'RedHat' and ansible_distribution_major_version <= '6'
+    - name: "Update current time from configured servers (chrony)"
+      command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
+      with_items: "{{ ntp_servers }}"
+      register: ntpdate
+      failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
+      when: ansible_os_family == 'Debian'
 
 - name: "Start NTP Service"
   ansible.builtin.service:
