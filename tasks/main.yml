@@ -1,17 +1,17 @@
 ---
 # tasks file for ansible-role-time
 
-- name: Include OS-specific variables.
-  include_vars: "{{ lookup('first_found', params) }}"
+- name: "Include OS-specific variables"
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
   vars:
     params:
       files:
-        - "{{ ansible_os_family }}_{{ ansible_distribution_major_version }}.yaml"
-        - "{{ ansible_distribution }}.yaml"
-        - "{{ ansible_os_family }}.yaml"
+        - '{{ansible_distribution}}_{{ansible_distribution_major_version}}.yaml'
+        - '{{ansible_distribution}}.yaml'
+        - '{{ansible_os_family}}.yaml'
         - default.yaml
       paths:
-        - "vars"
+        - 'vars'
 
 - name: "Gather the package facts"
   ansible.builtin.package_facts:
@@ -19,13 +19,13 @@
   when: ansible_facts.packages is not defined
 
 - name: "Set hosts TimeZone"
-  timezone:
+  community.general.timezone:
     name: "{{ timezone }}"
 
 - name: "Remove NTP Daemon, if installed (RHEL7)"
   block:
     - name: "Stop NTP Service, if not already stopped"
-      service:
+      ansible.builtin.service:
         name: "ntpd"
         state: stopped
         enabled: no
@@ -35,8 +35,8 @@
         state: absent
   when:
     - "'ntp' in ansible_facts.packages"
-    - ansible_os_family == 'RedHat'
-    - ansible_distribution_major_version >= '7'
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] >= '7'
 
 - name: "Install required packages, if not already installed"
   ansible.builtin.package:
@@ -77,26 +77,30 @@
     name: "{{ ntp_daemon }}"
     state: stopped
 
-- name: "Update current time from configured servers"
-  block:
-    - name: "Update current time from configured servers (chrony)"
-      command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
-      with_items: "{{ ntp_servers }}"
-      register: ntpdate
-      failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
-      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version >= '7'
-    - name: "Update current time from configured servers (ntpdate)"
-      command: ntpdate '{{ item }}'
-      with_items: "{{ ntp_servers }}"
-      register: ntpdate
-      failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
-      when: ansible_os_family == 'RedHat' and ansible_distribution_major_version <= '6'
-    - name: "Update current time from configured servers (chrony)"
-      command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
-      with_items: "{{ ntp_servers }}"
-      register: ntpdate
-      failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
-      when: ansible_os_family == 'Debian'
+- name: "Update current time from configured servers (chrony)"
+  ansible.builtin.command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
+  with_items: "{{ ntp_servers }}"
+  register: ntpdate
+  failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] >= '7'
+
+- name: "Update current time from configured servers (ntpdate)"
+  ansible.builtin.command: ntpdate '{{ item }}'
+  with_items: "{{ ntp_servers }}"
+  register: ntpdate
+  failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] <= '6'
+
+- name: "Update current time from configured servers (chrony)"
+  command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
+  with_items: "{{ ntp_servers }}"
+  register: ntpdate
+  failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
+  when: ansible_facts['os_family'] == 'Debian'
 
 - name: "Start NTP Service"
   ansible.builtin.service:
