@@ -65,6 +65,14 @@
         state: present
       with_items: "{{ ntp_servers }}"
 
+- name: "Specify user account to run NTP daemon under"
+  ansible.builtin.lineinfile:
+    path: "{{ ntp_daemon_config }}"
+    regexp: '(?i)^(OPTIONS.*)'
+    line: 'OPTIONS="-u chrony"'
+    state: present
+    backup: true
+
 - name: "Set Permissions on NTP HomeDir"
   ansible.builtin.file:
     path: "{{ ntp_homedir }}"
@@ -78,7 +86,8 @@
     state: stopped
 
 - name: "Update current time from configured servers (chrony)"
-  ansible.builtin.command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
+  #ansible.builtin.command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
+  ansible.builtin.command: chronyd -q -t 1 'server {{ item }}'
   with_items: "{{ ntp_servers }}"
   register: ntpdate
   failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
@@ -87,7 +96,7 @@
     - ansible_facts['distribution_major_version'] >= '7'
 
 - name: "Update current time from configured servers (ntpdate)"
-  ansible.builtin.command: ntpdate '{{ item }}'
+  ansible.builtin.command: ntpdate -q '{{ item }}'
   with_items: "{{ ntp_servers }}"
   register: ntpdate
   failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
@@ -96,7 +105,7 @@
     - ansible_facts['distribution_major_version'] <= '6'
 
 - name: "Update current time from configured servers (chrony)"
-  command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
+  command: chronyd -q -t 1 'server {{ item }}'
   with_items: "{{ ntp_servers }}"
   register: ntpdate
   failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
