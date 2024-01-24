@@ -72,6 +72,8 @@
     line: 'OPTIONS="-u chrony"'
     state: present
     backup: true
+  when:
+    - ansible_facts['os_family'] == 'RedHat'
 
 - name: "Set Permissions on NTP HomeDir"
   ansible.builtin.file:
