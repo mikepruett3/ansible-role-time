@@ -20,7 +20,8 @@
   failed_when: options.rc > 1
   changed_when: false
 
-- debug: options
+- debug:
+    var: options
 
 #- name: "Specify user account to run NTP daemon under"
 #  ansible.builtin.lineinfile:
