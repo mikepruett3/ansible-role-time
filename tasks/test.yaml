@@ -1,0 +1,19 @@
+---
+# Test tasks file for ansible-role-time
+
+- name: "Collect the NTP daemon runtime options"
+  ansible.builtin.shell:
+    cmd: grep ^OPTIONS '{{ ntp_daemon_config }}' | awk -F '=' '{print $2}' | tr -d '"'
+  register: options
+  failed_when: options.rc > 1
+  changed_when: false
+
+#- name: "Specify user account to run NTP daemon under"
+#  ansible.builtin.lineinfile:
+#    path: "{{ ntp_daemon_config }}"
+#    regexp: '(?i)^(OPTIONS.*)'
+#    line: 'OPTIONS="-u chrony {{ options }}"'
+#    state: present
+#    backup: true
+#  when:
+#    options is not match("chrony")
