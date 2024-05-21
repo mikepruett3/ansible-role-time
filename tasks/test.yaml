@@ -31,4 +31,4 @@
     #state: present
     backup: true
   when:
-    options.stdout is not match("chrony")
+    options.stdout is not search("chrony")
