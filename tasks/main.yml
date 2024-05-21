@@ -65,15 +65,23 @@
         state: present
       with_items: "{{ ntp_servers }}"
 
-- name: "Specify user account to run NTP daemon under"
-  ansible.builtin.lineinfile:
-    path: "{{ ntp_daemon_config }}"
-    regexp: '(?i)^(OPTIONS.*)'
-    line: 'OPTIONS="-u chrony"'
-    state: present
-    backup: true
+- name: "Collect the NTP daemon runtime options"
+  ansible.builtin.shell:
+    cmd: grep ^OPTIONS '{{ ntp_daemon_config }}' | awk -F '=' '{print $2}' | tr -d '"'
+  register: options
+  failed_when: options.rc > 1
+  changed_when: false
   when:
     - ansible_facts['os_family'] == 'RedHat'
+
+- name: "Specify user account to run NTP daemon under"
+  ansible.builtin.replace:
+    path: "{{ ntp_daemon_config }}"
+    regexp: '(?i)^(OPTIONS.*)'
+    replace: 'OPTIONS="-u chrony {{ options.stdout }}"'
+  when:
+    options is defined
+    options.stdout is not search("chrony")
 
 - name: "Set Permissions on NTP HomeDir"
   ansible.builtin.file:
