@@ -20,15 +20,10 @@
   failed_when: options.rc > 1
   changed_when: false
 
-- debug:
-    var: options
-
 - name: "Specify user account to run NTP daemon under"
   ansible.builtin.replace:
     path: "{{ ntp_daemon_config }}"
     regexp: '(?i)^(OPTIONS.*)'
     replace: 'OPTIONS="-u chrony {{ options.stdout }}"'
-    #state: present
-    backup: true
   when:
     options.stdout is not search("chrony")
