@@ -1,6 +1,18 @@
 ---
 # Test tasks file for ansible-role-time
 
+- name: "Include OS-specific variables"
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ansible_distribution}}_{{ansible_distribution_major_version}}.yaml'
+        - '{{ansible_distribution}}.yaml'
+        - '{{ansible_os_family}}.yaml'
+        - default.yaml
+      paths:
+        - 'vars'
+
 - name: "Collect the NTP daemon runtime options"
   ansible.builtin.shell:
     cmd: grep ^OPTIONS '{{ ntp_daemon_config }}' | awk -F '=' '{print $2}' | tr -d '"'
