@@ -64,7 +64,8 @@
   when:
     - configuration is defined
     - configuration is not ansible.builtin.search(item)
-  with_items: "{{ntp_servers}}"
+  with_items:
+    - "{{ ntp_servers }}"
 
 - name: "Disable existing pool entries in NTP configuration file, if not already there"
   ansible.builtin.replace:
@@ -74,7 +75,8 @@
   when:
     - configuration is defined
     - configuration is not ansible.builtin.search(item)
-  with_items: "{{ntp_servers}}"
+  with_items:
+    - "{{ ntp_servers }}"
 
 - name: "Insert desired server entires in NTP configuration file, if not already there"
   ansible.builtin.lineinfile:
