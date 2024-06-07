@@ -81,7 +81,7 @@
     replace: 'OPTIONS="-u chrony {{ options.stdout }}"'
   when:
     options is defined
-    options.stdout is not search("chrony")
+    options.stdout is not search("*chrony*")
 
 - name: "Set Permissions on NTP HomeDir"
   ansible.builtin.file:
