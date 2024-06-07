@@ -52,7 +52,7 @@
 
 - name: "test"
   debug:
-    msg: "Found it!"
+    msg: "{{ mounts['contents'] | b64decode }}"
   when:
     - contents is defined
     #- options.stdout is not ansible.builtin.search("chrony")
