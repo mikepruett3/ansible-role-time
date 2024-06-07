@@ -50,12 +50,18 @@
     src: "{{ ntp_config }}"
   register: contents
 
+- name: "Set fact of the NTP configuration file contents"
+  ansible.builtin.set_fact:
+    configuration: "{{ contents['content'] | b64decode }}"
+  when:
+    - contents is defined
+
 - name: "test"
   debug:
     msg: "{{ contents['content'] | b64decode }}"
   when:
-    - contents is defined
-    - contents['content'] | b64decode is not ansible.builtin.search(ntp_servers)
+    - configuration is defined
+    - configuration is not ansible.builtin.search(ntp_servers)
 
 #- name: "Disable existing server entries in NTP configuration file"
 #  ansible.builtin.replace:
