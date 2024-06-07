@@ -79,13 +79,14 @@
 - name: "Insert desired server entires in NTP configuration file, if not already there"
   ansible.builtin.lineinfile:
     path: "{{ ntp_config }}"
-    insertafter: '^(?!#server.*)$/s'
+    insertafter: '^(?!#server.*)$/m'
     line: "server {{ item }} iburst"
     state: present
   when:
     - configuration is defined
     - configuration is not ansible.builtin.search(item)
-  with_items: "{{ntp_servers}}"
+  with_items:
+    - "{{ ntp_servers }}"
 
 - name: "Collect the NTP daemon runtime options"
   ansible.builtin.shell:
