@@ -47,7 +47,7 @@
 
 - name: "Collect information of the NTP configuration file"
   ansible.builtin.set_fact:
-    contents: "{{ lookup('ansible.builtin.file', {{ntp_config}}) }}"
+    contents: "{{ lookup('ansible.builtin.file', ntp_config) }}"
 
 - name: "test"
   debug:
