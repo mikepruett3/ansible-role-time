@@ -61,7 +61,7 @@
     msg: "{{ contents['content'] | b64decode }}"
   when:
     - configuration is defined
-    - configuration is not ansible.builtin.search(groups['ntp_servers'])
+    - configuration is not ansible.builtin.search(groups.ntp_servers)
 
 #- name: "Disable existing server entries in NTP configuration file"
 #  ansible.builtin.replace:
