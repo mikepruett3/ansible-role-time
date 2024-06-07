@@ -56,34 +56,39 @@
   when:
     - contents is defined
 
-- name: "test"
-  debug:
-    msg: "{{ contents['content'] | b64decode }}"
+- name: "Disable existing server entries in NTP configuration file, if not already there"
+  ansible.builtin.replace:
+    path: "{{ ntp_config }}"
+    regexp: '^(server.*)$'
+    replace: '#\1'
   when:
     - configuration is defined
     - configuration is not ansible.builtin.search(item)
   with_items:
     - ntp_servers
 
-#- name: "Disable existing server entries in NTP configuration file"
-#  ansible.builtin.replace:
-#    path: "{{ ntp_config }}"
-#    regexp: '^(server.*)$'
-#    replace: '#\1'
+- name: "Disable existing pool entries in NTP configuration file, if not already there"
+  ansible.builtin.replace:
+    path: "{{ ntp_config }}"
+    regexp: '^(pool.*)$'
+    replace: '#\1'
+  when:
+    - configuration is defined
+    - configuration is not ansible.builtin.search(item)
+  with_items:
+    - ntp_servers
 
-#- name: "Disable existing pool entries"
-#  ansible.builtin.replace:
-#    path: "{{ ntp_config }}"
-#    regexp: '^(pool.*)$'
-#    replace: '#\1'
-
-#- name: "Insert desired server entires"
-#  ansible.builtin.lineinfile:
-#    path: "{{ ntp_config }}"
-#    insertafter: "EOF"
-#    line: "server {{ item }}"
-#    state: present
-#  with_items: "{{ ntp_servers }}"
+- name: "Insert desired server entires in NTP configuration file, if not already there"
+  ansible.builtin.lineinfile:
+    path: "{{ ntp_config }}"
+    insertafter: '^(?!server.*)$/s'
+    line: "server {{ item }} iburst"
+    state: present
+  when:
+    - configuration is defined
+    - configuration is not ansible.builtin.search(item)
+  with_items:
+    - ntp_servers
 
 - name: "Collect the NTP daemon runtime options"
   ansible.builtin.shell:
