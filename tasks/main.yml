@@ -80,8 +80,8 @@
     regexp: '(?i)^(OPTIONS.*)'
     replace: 'OPTIONS="-u chrony {{ options.stdout }}"'
   when:
-    options is defined
-    options.stdout is not ansible.builtin.search(chrony)
+    - options is defined
+    - options.stdout is not ansible.builtin.search("chrony")
 
 - name: "Set Permissions on NTP HomeDir"
   ansible.builtin.file:
