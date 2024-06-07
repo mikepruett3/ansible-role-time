@@ -46,7 +46,7 @@
   when: item|string not in ansible_facts.packages
 
 - name: "Collect information of the NTP configuration file"
-  ansible.builtin.set_facts:
+  ansible.builtin.set_fact:
     contents: "{{ lookup('ansible.builtin.file', ntp_config) }}"
 
 - name: "test"
