@@ -55,7 +55,7 @@
     msg: "{{ contents['content'] | b64decode }}"
   when:
     - contents is defined
-    #- options.stdout is not ansible.builtin.search("chrony")
+    - contents['content'] | b64decode is not ansible.builtin.search(ntp_servers)
 
 #- name: "Disable existing server entries in NTP configuration file"
 #  ansible.builtin.replace:
