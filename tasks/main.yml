@@ -78,17 +78,6 @@
   with_items:
     - "{{ ntp_servers }}"
 
-- name: "Collect information of the NTP configuration file (after modification)"
-  ansible.builtin.slurp:
-    src: "{{ ntp_config }}"
-  register: contents
-
-- name: "Set fact of the NTP configuration file contents (after modification)"
-  ansible.builtin.set_fact:
-    configuration: "{{ contents['content'] | b64decode }}"
-  when:
-    - contents is defined
-
 - name: "Insert desired server entires in NTP configuration file, if not already there"
   ansible.builtin.lineinfile:
     path: "{{ ntp_config }}"
