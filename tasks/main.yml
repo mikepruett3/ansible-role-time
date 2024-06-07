@@ -45,25 +45,36 @@
   with_items: "{{ packages }}"
   when: item|string not in ansible_facts.packages
 
-- name: "Update NTP configuration file"
-  block:
-    - name: "Disable existing server entries"
-      ansible.builtin.replace:
-        path: "{{ ntp_config }}"
-        regexp: '^(server.*)$'
-        replace: '#\1'
-    - name: "Disable existing pool entries"
-      ansible.builtin.replace:
-        path: "{{ ntp_config }}"
-        regexp: '^(pool.*)$'
-        replace: '#\1'
-    - name: "Insert desired server entires"
-      ansible.builtin.lineinfile:
-        path: "{{ ntp_config }}"
-        insertafter: "EOF"
-        line: "server {{ item }}"
-        state: present
-      with_items: "{{ ntp_servers }}"
+- name: "Collect information of the NTP configuration file"
+  ansible.builtin.set_facts:
+    contents: "{{ lookup('ansible.builtin.file', ntp_config) }}"
+
+- name: "test"
+  debug:
+    msg: "Found it!"
+  when:
+    - contents is defined
+    #- options.stdout is not ansible.builtin.search("chrony")
+
+#- name: "Disable existing server entries in NTP configuration file"
+#  ansible.builtin.replace:
+#    path: "{{ ntp_config }}"
+#    regexp: '^(server.*)$'
+#    replace: '#\1'
+
+#- name: "Disable existing pool entries"
+#  ansible.builtin.replace:
+#    path: "{{ ntp_config }}"
+#    regexp: '^(pool.*)$'
+#    replace: '#\1'
+
+#- name: "Insert desired server entires"
+#  ansible.builtin.lineinfile:
+#    path: "{{ ntp_config }}"
+#    insertafter: "EOF"
+#    line: "server {{ item }}"
+#    state: present
+#  with_items: "{{ ntp_servers }}"
 
 - name: "Collect the NTP daemon runtime options"
   ansible.builtin.shell:
