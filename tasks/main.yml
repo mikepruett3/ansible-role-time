@@ -82,7 +82,7 @@
 - name: "Insert desired server entires in NTP configuration file, if not already there"
   ansible.builtin.lineinfile:
     path: "{{ ntp_config }}"
-    insertafter: '^(\#server.*)$'
+    insertafter: '^(\#pool.*)$'
     line: "server {{ item }} iburst"
     state: present
   when:
