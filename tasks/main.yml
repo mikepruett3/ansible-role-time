@@ -43,7 +43,8 @@
     name: "{{ item }}"
     state: present
   with_items: "{{ packages }}"
-  when: item|string not in ansible_facts.packages
+  when:
+    - item|string not in ansible_facts.packages
 
 - name: "Collect information of the NTP configuration file"
   ansible.builtin.slurp:
@@ -108,21 +109,29 @@
     - options is defined
     - options.stdout is not ansible.builtin.search("chrony")
 
+- name: "Get Permissions of NTP HomeDir"
+  ansible.builtin.stat:
+    path: "{{ ntp_homedir }}"
+  register: result
+
 - name: "Set Permissions on NTP HomeDir"
   ansible.builtin.file:
     path: "{{ ntp_homedir }}"
-    mode: 0750
+    mode: '0750'
     state: directory
     recurse: no
+  when:
+    - result is defined
+    - result.stat.mode is not '0750'
 
 - name: "Stop NTP Service"
   ansible.builtin.service:
     name: "{{ ntp_daemon }}"
     state: stopped
 
-- name: "Update current time from configured servers (chrony)"
+- name: "Update current time from configured servers (RedHat - chrony)"
   #ansible.builtin.command: chronyd -q -t 1 'server {{ item }} maxsamples 1'
-  ansible.builtin.command: chronyd -q -t 1 'server {{ item }}'
+  ansible.builtin.command: chronyd -q -t 1 'server {{ item }} iburst'
   with_items: "{{ ntp_servers }}"
   register: ntpdate
   failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
@@ -130,7 +139,7 @@
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['distribution_major_version'] >= '7'
 
-- name: "Update current time from configured servers (ntpdate)"
+- name: "Update current time from configured servers (RedHat - ntpdate)"
   ansible.builtin.command: ntpdate -q '{{ item }}'
   with_items: "{{ ntp_servers }}"
   register: ntpdate
@@ -139,12 +148,13 @@
     - ansible_facts['os_family'] == 'RedHat'
     - ansible_facts['distribution_major_version'] <= '6'
 
-- name: "Update current time from configured servers (chrony)"
+- name: "Update current time from configured servers (Debian - chrony)"
   command: chronyd -q -t 1 'server {{ item }}'
   with_items: "{{ ntp_servers }}"
   register: ntpdate
   failed_when: ntpdate.rc != 1 and ntpdate.rc != 0
-  when: ansible_facts['os_family'] == 'Debian'
+  when:
+    - ansible_facts['os_family'] == 'Debian'
 
 - name: "Start NTP Service"
   ansible.builtin.service:
