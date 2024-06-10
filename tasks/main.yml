@@ -122,7 +122,7 @@
     recurse: no
   when:
     - result is defined
-    - result.stat.mode is not '0750'
+    - result.stat.mode is not "0750"
 
 - name: "Stop NTP Service"
   ansible.builtin.service:
