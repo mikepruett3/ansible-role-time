@@ -98,6 +98,7 @@
   changed_when: false
   when:
     - ansible_facts['distribution'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] >= '8'
 
 - name: "Specify user account to run NTP daemon under"
   ansible.builtin.replace:
@@ -106,6 +107,7 @@
     replace: 'OPTIONS="-u chrony {{ options.stdout }}"'
   when:
     - ansible_facts['distribution'] == 'RedHat'
+    - ansible_facts['distribution_major_version'] >= '8'
     - options is defined
     - options.stdout is not ansible.builtin.search("chrony")
 
