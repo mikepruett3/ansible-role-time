@@ -105,9 +105,9 @@
     regexp: '(?i)^(OPTIONS.*)'
     replace: 'OPTIONS="-u chrony {{ options.stdout }}"'
   when:
+    - ansible_facts['distribution'] == 'RedHat'
     - options is defined
     - options.stdout is not ansible.builtin.search("chrony")
-    - ansible_facts['distribution'] == 'RedHat'
 
 - name: "Get Permissions of NTP HomeDir"
   ansible.builtin.stat:
