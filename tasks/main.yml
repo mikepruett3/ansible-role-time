@@ -107,6 +107,7 @@
   when:
     - options is defined
     - options.stdout is not ansible.builtin.search("chrony")
+    - ansible_facts['distribution'] == 'RedHat'
 
 - name: "Get Permissions of NTP HomeDir"
   ansible.builtin.stat:
