@@ -97,7 +97,7 @@
   failed_when: options.rc > 1
   changed_when: false
   when:
-    - ansible_facts['os_family'] == 'RedHat'
+    - ansible_facts['distribution'] == 'RedHat'
 
 - name: "Specify user account to run NTP daemon under"
   ansible.builtin.replace:
