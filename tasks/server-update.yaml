@@ -56,3 +56,8 @@
     - configuration is not ansible.builtin.search(item)
   with_items:
     - "{{ ntp_servers }}"
+
+- name: "Restart NTP Service"
+  ansible.builtin.service:
+    name: "{{ ntp_daemon }}"
+    state: restarted
