@@ -1,0 +1,58 @@
+---
+# Server Update tasks file for ansible-role-time
+
+- name: "Include OS-specific variables"
+  ansible.builtin.include_vars: "{{ lookup('ansible.builtin.first_found', params) }}"
+  vars:
+    params:
+      files:
+        - '{{ansible_os_family}}_{{ansible_distribution_major_version}}.yaml'
+        - '{{ansible_os_family}}.yaml'
+        - '{{ansible_os_family}}.yaml'
+      paths:
+        - 'vars'
+
+- name: "Collect information of the NTP configuration file"
+  ansible.builtin.slurp:
+    src: "{{ ntp_config }}"
+  register: contents
+
+- name: "Set fact of the NTP configuration file contents"
+  ansible.builtin.set_fact:
+    configuration: "{{ contents['content'] | b64decode }}"
+  when:
+    - contents is defined
+
+- name: "Disable existing server entries in NTP configuration file, if not already there"
+  ansible.builtin.replace:
+    path: "{{ ntp_config }}"
+    regexp: '^(server.*)$'
+    replace: '#\1'
+  when:
+    - configuration is defined
+    - configuration is not ansible.builtin.search(item)
+  with_items:
+    - "{{ ntp_servers }}"
+
+- name: "Disable existing pool entries in NTP configuration file, if not already there"
+  ansible.builtin.replace:
+    path: "{{ ntp_config }}"
+    regexp: '^(pool.*)$'
+    replace: '#\1'
+  when:
+    - configuration is defined
+    - configuration is not ansible.builtin.search(item)
+  with_items:
+    - "{{ ntp_servers }}"
+
+- name: "Insert desired server entires in NTP configuration file, if not already there"
+  ansible.builtin.lineinfile:
+    path: "{{ ntp_config }}"
+    insertafter: '^(\#server.*)$'
+    line: "server {{ item }} iburst"
+    state: present
+  when:
+    - configuration is defined
+    - configuration is not ansible.builtin.search(item)
+  with_items:
+    - "{{ ntp_servers }}"
