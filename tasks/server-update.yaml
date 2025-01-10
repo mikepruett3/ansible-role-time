@@ -57,7 +57,17 @@
   with_items:
     - "{{ ntp_servers }}"
 
-- name: "Restart NTP Service"
+- name: "Stop NTP Service"
   ansible.builtin.service:
     name: "{{ ntp_daemon }}"
-    state: restarted
+    state: stopped
+
+- name: "Update current time from configured servers"
+  command: chronyd -q 'server {{ item }}'
+  with_items:
+    - "{{ ntp_servers }}"
+
+- name: "Start NTP Service"
+  ansible.builtin.service:
+    name: "{{ ntp_daemon }}"
+    state: started
