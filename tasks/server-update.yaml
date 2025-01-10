@@ -63,7 +63,8 @@
     state: stopped
 
 - name: "Update current time from configured servers"
-  command: chronyd -q 'server {{ item }}'
+  command: chronyd -q -t 1 'server {{ item }}'
+  ignore_errors: true
   with_items:
     - "{{ ntp_servers }}"
 
